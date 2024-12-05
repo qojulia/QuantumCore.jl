@@ -1,5 +1,16 @@
 # News
 
+## v0.4.0 - 2024-12-10
+
+This version implements the RFC in #40 without deprecating anything. Future versions will first add deprecation warnings before removing any existing interfaces.
+
+- Eliminate all type parameters from `StateVector`, `AbstractKet`, `AbstractBra`, `AbstractOperator`, and `AbstractSuperOperator`.
+- Implement new basis checking interface consisting of `multiplicable`, `addible`, `check_multiplicable`, `check_addible`, and `@compatiblebases`.
+- Add `basis_l` and `basis_r` to get left and right bases of operators. 
+- Implement `size` for all bases and implement `getindex` for `CompositeBasis`.
+- Add method interface to existing subtypes of `Bases`: `spinnumber`, `cutoff`, `offset`.
+- Add `KetBraBasis`, `ChoiRefSysBasis`, `ChoiOutSysBasis`, and `_PauliBasis`. Note that eventually `_PauliBasis` will be renamed to `PauliBasis`.
+
 ## v0.3.7 - 2024-12-05
 
 - Rename `PauliBasis` to `NQubitBasis` with warning, and add deprecation to `equal_bases`.
