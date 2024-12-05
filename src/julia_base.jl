@@ -14,7 +14,6 @@ addnumbererror() = throw(ArgumentError("Can't add or subtract a number and an op
 *(a::StateVector, b::Number) = b*a
 copy(a::T) where {T<:StateVector} = T(a.basis, copy(a.data)) # FIXME issue #12
 length(a::StateVector) = length(a.basis)::Int # FIXME issue #12
-basis(a::StateVector) = a.basis # FIXME issue #12
 adjoint(a::StateVector) = dagger(a)
 
 
@@ -33,8 +32,6 @@ Base.broadcastable(x::StateVector) = x
 ##
 
 length(a::AbstractOperator) = length(a.basis_l)::Int*length(a.basis_r)::Int  # FIXME issue #12
-basis(a::AbstractOperator) = (check_samebases(a); a.basis_l) # FIXME issue #12
-basis(a::AbstractSuperOperator) = (check_samebases(a); a.basis_l[1]) # FIXME issue #12
 
 # Ensure scalar broadcasting
 Base.broadcastable(x::AbstractOperator) = Ref(x)

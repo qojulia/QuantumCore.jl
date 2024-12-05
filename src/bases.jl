@@ -7,7 +7,7 @@
 
 Total dimension of the Hilbert space.
 """
-Base.length(b::Basis) = prod(b.shape)
+Base.length(b::Basis) = prod(b.shape) # change to prod(size(b)) when downstream Bases are updated
 
 """
     GenericBasis(N)
@@ -24,7 +24,7 @@ end
 GenericBasis(N::Integer) = GenericBasis([N])
 
 Base.:(==)(b1::GenericBasis, b2::GenericBasis) = equal_shape(b1.shape, b2.shape)
-
+Base.size(b::GenericBasis) = b.shape
 
 """
     CompositeBasis(b1, b2...)
@@ -42,8 +42,11 @@ end
 CompositeBasis(bases) = CompositeBasis([length(b) for b ∈ bases], bases)
 CompositeBasis(bases::Basis...) = CompositeBasis((bases...,))
 CompositeBasis(bases::Vector) = CompositeBasis((bases...,))
+#bases(b::CompositeBasis) = b.bases
 
 Base.:(==)(b1::T, b2::T) where T<:CompositeBasis = equal_shape(b1.shape, b2.shape)
+Base.size(b::CompositeBasis) = length.(b.bases)
+Base.getindex(b::CompositeBasis, i) = getindex(b.bases, i)
 
 ##
 # Common bases
@@ -69,6 +72,9 @@ struct FockBasis{T} <: Basis
 end
 
 Base.:(==)(b1::FockBasis, b2::FockBasis) = (b1.N==b2.N && b1.offset==b2.offset)
+Base.size(b::FockBasis) = (b.N - b.offset + 1,)
+cutoff(b::FockBasis) = b.N
+offset(b::FockBasis) = b.offset
 
 
 """
@@ -88,6 +94,7 @@ struct NLevelBasis{T} <: Basis
 end
 
 Base.:(==)(b1::NLevelBasis, b2::NLevelBasis) = b1.N == b2.N
+Base.size(b::NLevelBasis) = (b.N,)
 
 """
     NQubitBasis(num_qubits::Int)
@@ -106,6 +113,7 @@ struct NQubitBasis{S,B} <: Basis
 end
 
 Base.:(==)(pb1::NQubitBasis, pb2::NQubitBasis) = length(pb1.bases) == length(pb2.bases)
+Base.size(b::NQubitBasis) = b.shape
 
 """
     SpinBasis(n)
@@ -132,7 +140,8 @@ SpinBasis(spinnumber::Rational) = SpinBasis{spinnumber}(spinnumber)
 SpinBasis(spinnumber) = SpinBasis(convert(Rational{Int}, spinnumber))
 
 Base.:(==)(b1::SpinBasis, b2::SpinBasis) = b1.spinnumber==b2.spinnumber
-
+Base.size(b::SpinBasis) = (numerator(b.spinnumber*2 + 1),)
+spinnumber(b::SpinBasis) = b.spinnumber
 
 """
     SumBasis(b1, b2...)
@@ -151,3 +160,4 @@ SumBasis(bases::Basis...) = SumBasis((bases...,))
 Base.:(==)(b1::T, b2::T) where T<:SumBasis = equal_shape(b1.shape, b2.shape)
 Base.:(==)(b1::SumBasis, b2::SumBasis) = false
 Base.length(b::SumBasis) = sum(b.shape)
+# TODO how should `.bases` be accessed? `getindex` or a `sumbases` method?

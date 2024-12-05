@@ -4,6 +4,50 @@
 
 const BASES_CHECK = Ref(true)
 
+"""
+    @compatiblebases
+
+Macro to skip checks for compatible bases. Useful for `*`, `expect` and similar
+functions.
+"""
+macro compatiblebases(ex)
+    return quote
+        BASES_CHECK.x = false
+        local val = $(esc(ex))
+        BASES_CHECK.x = true
+        val
+    end
+end
+
+function check_addible(b1, b2)
+    if BASES_CHECK[] && !addible(b1, b2)
+        throw(IncompatibleBases())
+    end
+end
+
+function check_multiplicable(b1, b2)
+    if BASES_CHECK[] && !multiplicable(b1, b2)
+        throw(IncompatibleBases())
+    end
+end
+
+addible(a::AbstractQObjType, b::AbstractQObjType) = false
+addible(a::AbstractBra, b::AbstractBra) = (basis(a) == basis(b))
+addible(a::AbstractKet, b::AbstractKet) = (basis(a) == basis(b))
+addible(a::AbstractOperator, b::AbstractOperator) =
+    (basis_l(a) == basis_l(b)) && (basis_r(a) == basis_r(b))
+
+multiplicable(a::AbstractQObjType, b::AbstractQObjType) = false
+multiplicable(a::AbstractBra, b::AbstractKet) = (basis(a) == basis(b))
+multiplicable(a::AbstractOperator, b::AbstractKet) = (basis_r(a) == basis(b))
+multiplicable(a::AbstractBra, b::AbstractOperator) = (basis(a) == basis_l(b))
+multiplicable(a::AbstractOperator, b::AbstractOperator) = (basis_r(a) == basis_l(b))
+
+basis(a::StateVector) = throw(ArgumentError("basis() is not defined for this type of state vector: $(typeof(a))."))
+basis_l(a::AbstractOperator) = throw(ArgumentError("basis_l() is not defined for this type of operator: $(typeof(a))."))
+basis_r(a::AbstractOperator) = throw(ArgumentError("basis_r() is not defined for this type of operator: $(typeof(a))."))
+basis(a::AbstractOperator) = (basis_l(a) == basis_r(a); basis_l(a))
+
 ##
 # tensor, reduce, ptrace
 ##
