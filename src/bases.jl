@@ -45,26 +45,6 @@ CompositeBasis(bases::Vector) = CompositeBasis((bases...,))
 
 Base.:(==)(b1::T, b2::T) where T<:CompositeBasis = equal_shape(b1.shape, b2.shape)
 
-"""
-    equal_shape(a, b)
-
-Check if two shape vectors are the same.
-"""
-function equal_shape(a, b)
-    if a === b
-        return true
-    end
-    if length(a) != length(b)
-        return false
-    end
-    for i=1:length(a)
-        if a[i]!=b[i]
-            return false
-        end
-    end
-    return true
-end
-
 ##
 # Common bases
 ##
