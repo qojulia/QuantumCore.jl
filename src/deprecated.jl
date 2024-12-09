@@ -1,3 +1,5 @@
+# TODO: figure out how to deprecate abstract type
+abstract type AbstractSuperOperator end
 
 basis(a::AbstractSuperOperator) = (check_samebases(a); a.basis_l[1]) # FIXME issue #12
 

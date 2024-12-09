@@ -161,3 +161,51 @@ Base.:(==)(b1::T, b2::T) where T<:SumBasis = equal_shape(b1.shape, b2.shape)
 Base.:(==)(b1::SumBasis, b2::SumBasis) = false
 Base.length(b::SumBasis) = sum(b.shape)
 # TODO how should `.bases` be accessed? `getindex` or a `sumbases` method?
+
+##
+# Operator Bases
+##
+
+"""
+    KetBraBasis(BL,BR)
+
+Typical "Ket-Bra" outter-product Basis.
+TODO: write more... 
+"""
+struct KetBraBasis <: Basis
+    left::Basis
+    right::Basis
+end
+KetBraBasis(b::Basis) = KetBraBasis(b,b)
+basis_l(b::KetBraBasis) = b.left
+basis_r(b::KetBraBasis) = b.right
+Base.:(==)(b1::KetBraBasis, b2::KetBraBasis) = (b1.left == b2.left && b1.right == b2.right)
+Base.length(b::KetBraBasis) = length(b.left)*length(b.right)
+Base.size(b::KetBraBasis) = (length(b.left), length(b.right))
+
+struct ChoiRefSysBasis <: Basis
+    basis::Basis
+end
+Base.:(==)(b1::ChoiRefSysBasis, b2::ChoiRefSysBasis) = (b1.basis == b2.basis)
+Base.length(b::ChoiRefSysBasis) = length(b.basis)
+Base.size(b::ChoiRefSysBasis) = (length(b.basis),)
+
+struct ChoiOutSysBasis <: Basis
+    basis::Basis
+end
+Base.:(==)(b1::ChoiOutSysBasis, b2::ChoiOutSysBasis) = (b1.basis == b2.basis)
+Base.length(b::ChoiOutSysBasis) = length(b.basis)
+Base.size(b::ChoiOutSysBasis) = (length(b.basis),)
+
+
+"""
+    _PauliBasis()
+
+Pauli operator basis consisting of I, Z, X, Y, in that order.
+"""
+struct _PauliBasis <: Basis
+end
+
+Base.:(==)(pb1::_PauliBasis, pb2::_PauliBasis) = true
+Base.length(b::_PauliBasis) = 4
+Base.size(b::_PauliBasis) = (4,)
